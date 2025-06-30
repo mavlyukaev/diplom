@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cadence v1.0</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+</head>
+<body>
+    <nav class="navbar bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand">Каденция</a>
+        </div>
+    </nav>
+    <form>
+        <div class="container my-3">
+            <div class="row">
+                <div class="col">
+                    <p class="text-center">Параметры</p>
+                    <div class="form-floating mb-3">
+                        <input class="form-control" value="10" id="durationInput" type="text">
+                        <label for="durationInput">Длительность</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="framerateInput" value="60">
+                        <label for="framerateInput">Кадры в секунду</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="heightInput" value="1080">
+                        <label for="heightInput">Высота</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="widthInput" value="1920">
+                        <label for="widthInput">Ширина</label>
+                    </div>
+                </div>
+                <div class="col" id="viewport">
+                    <div id="status"></div>
+                    <p class="text-center">Окно результата</p>
+                    <video controls id="videoOutput" width="600"></video>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <p class="text-center">Настройки анимации</p>
+            <ul class="nav nav-tabs justify-content-center">
+                <li class="nav-item">
+                    <a class="nav-link" id="animCircleTab">Круговая</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="animVerticalTab">Вертикальная</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="animHorizontalTab">Горизонтальная</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="animZoomTab">Приближение</a>
+                </li>
+            </ul>
+            <div class="my-3" id="animCircleCanvas" hidden>
+                <div class="my-3">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="animCircleEnabled">
+                        <label class="form-check-label" for="animCircleEnabled">Использовать</label>
+                    </div>
+                </div>
+                <div class="container text-center">
+                    <div class="row">
+                        <div class="col">
+                             <div class="mb-3">
+                                <label for="animCircleIntensityInput">Интенсивность</label>
+                                <input type="range" class="form-range" min="0" max="4" step="0.1" value="1.0" id="animCircleIntensityInput" disabled>
+                                <output for="animCircleIntensityInput" id="animCircleIntensityRangeValue" aria-hidden="true"></output>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="animCircleIsometricInput">Изометрия</label>
+                                <input type="range" class="form-range" min="0" max="1" step="0.1" value="0.5" id="animCircleIsometricInput" disabled>
+                                <output for="animCircleIsometricInput" id="animCircleIsometricRangeValue" aria-hidden="true"></output>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="animCircleSteadyInput">Постоянность</label>
+                                <input type="range" class="form-range" min="0" max="1" step="0.1" value="0.5" id="animCircleSteadyInput" disabled>
+                                <output for="animCircleSteadyInput" id="animCircleSteadyRangeValue" aria-hidden="true"></output>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="animCircleReverseInput" value="forward" disabled>
+                                <label for="animCircleReverseInput">Реверс</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="animCircleCumulativeInput" value="force" disabled>
+                                <label for="animCircleCumulativeInput">Кумулятивность</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="animCircleSmoothInput" value="linear" disabled>
+                                <label for="animCircleSmoothInput">Плавность</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="my-3" id="animHorizontalCanvas" hidden>
+                <div class="my-3">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="animHorizontalEnabled">
+                        <label class="form-check-label" for="animHorizontalEnabled">Использовать</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="animHorizontalLoop" disabled>
+                        <label class="form-check-label" for="animHorizontalLoop">Зациклить</label>
+                    </div>
+                </div>
+                <div class="container text-center">
+                    <div class="row">
+                        <div class="col">
+                             <div class="mb-3">
+                                <label for="animHorizontalIntensityInput">Интенсивность</label>
+                                <input type="range" class="form-range" min="0" max="4" step="0.1" value="1.0" id="animHorizontalIntensityInput" disabled>
+                                <output for="animHorizontalIntensityInput" id="animHorizontalIntensityRangeValue" aria-hidden="true"></output>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="animHorizontalIsometricInput">Изометрия</label>
+                                <input type="range" class="form-range" min="0" max="1" step="0.1" value="0.5" id="animHorizontalIsometricInput" disabled>
+                                <output for="animHorizontalIsometricInput" id="animHorizontalIsometricRangeValue" aria-hidden="true"></output>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="animHorizontalSteadyInput">Постоянность</label>
+                                <input type="range" class="form-range" min="0" max="1" step="0.1" value="0.5" id="animHorizontalSteadyInput" disabled>
+                                <output for="animHorizontalSteadyInput" id="animHorizontalSteadyRangeValue" aria-hidden="true"></output>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="animHorizontalReverseInput" value="forward" disabled>
+                                <label for="animHorizontalReverseInput">Реверс</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="animHorizontalCumulativeInput" value="force" disabled>
+                                <label for="animHorizontalCumulativeInput">Кумулятивность</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="animHorizontalSmoothInput" value="linear" disabled>
+                                <label for="animHorizontalSmoothInput">Плавность</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="my-3" id="animVerticalCanvas" hidden>
+                <div class="my-3">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="animVerticalEnabled">
+                        <label class="form-check-label" for="animVerticalEnabled">Использовать</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="animVerticalLoop" disabled>
+                        <label class="form-check-label" for="animVerticalLoop">Зациклить</label>
+                    </div>
+                </div>
+                <div class="container text-center">
+                    <div class="row">
+                        <div class="col">
+                             <div class="mb-3">
+                                <label for="animVerticalIntensityInput">Интенсивность</label>
+                                <input type="range" class="form-range" min="0" max="4" step="0.1" value="1.0" id="animVerticalIntensityInput" disabled>
+                                <output for="animVerticalIntensityInput" id="animVerticalIntensityRangeValue" aria-hidden="true"></output>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="animVerticalIsometricInput">Изометрия</label>
+                                <input type="range" class="form-range" min="0" max="1" step="0.1" value="0.5" id="animVerticalIsometricInput" disabled>
+                                <output for="animVerticalIsometricInput" id="animVerticalIsometricRangeValue" aria-hidden="true"></output>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="animVerticalSteadyInput">Постоянность</label>
+                                <input type="range" class="form-range" min="0" max="1" step="0.1" value="0.5" id="animVerticalSteadyInput" disabled>
+                                <output for="animVerticalSteadyInput" id="animVerticalSteadyRangeValue" aria-hidden="true"></output>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="animVerticalReverseInput" value="forward" disabled>
+                                <label for="animVerticalReverseInput">Реверс</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="animVerticalCumulativeInput" value="force" disabled>
+                                <label for="animVerticalCumulativeInput">Кумулятивность</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="animVerticalSmoothInput" value="linear" disabled>
+                                <label for="animVerticalSmoothInput">Плавность</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="my-3" id="animZoomCanvas" hidden>
+                <div class="my-3">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="animZoomEnabled">
+                        <label class="form-check-label" for="animZoomEnabled">Использовать</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="animZoomLoop" disabled>
+                        <label class="form-check-label" for="animZoomLoop">Зациклить</label>
+                    </div>
+                </div>
+                <div class="container text-center">
+                    <div class="row">
+                        <div class="col">
+                             <div class="mb-3">
+                                <label for="animZoomIntensityInput">Интенсивность</label>
+                                <input type="range" class="form-range" min="0" max="4" step="0.1" value="1.0" id="animZoomIntensityInput" disabled>
+                                <output for="animZoomIntensityInput" id="animZoomIntensityRangeValue" aria-hidden="true"></output>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="animZoomReverseInput" value="forward" disabled>
+                                <label for="animZoomReverseInput">Реверс</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="animZoomCumulativeInput" value="force" disabled>
+                                <label for="animZoomCumulativeInput">Кумулятивность</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="animZoomSmoothInput" value="linear" disabled>
+                                <label for="animZoomSmoothInput">Плавность</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <input type="file" class="form-control" id="imageInput" accept="image/*">
+            <button type="button" class="btn btn-dark form-control my-3" id="renderButton">Создать видео</button>
+        </div>
+    </form>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
+    <script>
+        /* Inputs */
+        const circleIntensityRangeInput = document.getElementById('animCircleIntensityInput');
+        const horizontalIntensityRangeInput = document.getElementById('animHorizontalIntensityInput');
+        const verticalIntensityRangeInput = document.getElementById('animVerticalIntensityInput');
+        const zoomIntensityRangeInput = document.getElementById('animZoomIntensityInput');
+
+        const circleIsometricRangeInput = document.getElementById('animCircleIsometricInput');
+        const horizontalIsometricRangeInput = document.getElementById('animHorizontalIsometricInput');
+        const verticalIsometricRangeInput = document.getElementById('animVerticalIsometricInput');
+        const zoomIsometricRangeInput = document.getElementById('animZoomIsometricInput');
+
+        const circleSteadyRangeInput = document.getElementById('animCircleSteadyInput');
+        const horizontalSteadyRangeInput = document.getElementById('animHorizontalSteadyInput');
+        const verticalSteadyRangeInput = document.getElementById('animVerticalSteadyInput');
+        const zoomSteadyRangeInput = document.getElementById('animZoomSteadyInput');
+       
+        /* Outputs */
+        const circleIntensityRangeOutput = document.getElementById('animCircleIntensityRangeValue');
+        const horizontalIntensityRangeOutput = document.getElementById('animHorizontalIntensityRangeValue');
+        const verticalIntensityRangeOutput = document.getElementById('animVerticalIntensityRangeValue');
+        const zoomIntensityRangeOutput = document.getElementById('animZoomIntensityRangeValue');
+       
+        const circleIsometricRangeOutput = document.getElementById('animCircleIsometricRangeValue');
+        const horizontalIsometricRangeOutput = document.getElementById('animHorizontalIsometricRangeValue');
+        const verticalIsometricRangeOutput = document.getElementById('animVerticalIsometricRangeValue');
+       
+        const circleSteadyRangeOutput = document.getElementById('animCircleSteadyRangeValue');
+        const horizontalSteadyRangeOutput = document.getElementById('animHorizontalSteadyRangeValue');
+        const verticalSteadyRangeOutput = document.getElementById('animVerticalSteadyRangeValue');
+
+        /* Initialize indicator's */
+        circleIntensityRangeOutput.textContent = circleIntensityRangeInput.value;
+        circleIsometricRangeOutput.textContent = circleIsometricRangeInput.value;
+        circleSteadyRangeOutput.textContent = circleSteadyRangeInput.value;
+
+        horizontalIntensityRangeOutput.textContent = horizontalIntensityRangeInput.value;
+        horizontalIsometricRangeOutput.textContent = horizontalIsometricRangeInput.value;
+        horizontalSteadyRangeOutput.textContent = horizontalSteadyRangeInput.value;
+
+        verticalIntensityRangeOutput.textContent = verticalIntensityRangeInput.value;
+        verticalIsometricRangeOutput.textContent = verticalIsometricRangeInput.value;
+        verticalSteadyRangeOutput.textContent = verticalSteadyRangeInput.value;
+
+        zoomIntensityRangeOutput.textContent = zoomIntensityRangeInput.value;
+
+        /* Listener's */
+        circleIntensityRangeInput.addEventListener('input', function() {circleIntensityRangeOutput.textContent = this.value;});
+        circleIsometricRangeInput.addEventListener('input', function() {circleIsometricRangeOutput.textContent = this.value;});
+        circleSteadyRangeInput.addEventListener('input', function() {circleSteadyRangeOutput.textContent = this.value;});
+
+        horizontalIntensityRangeInput.addEventListener('input', function() {horizontalIntensityRangeOutput.textContent = this.value;});
+        horizontalIsometricRangeInput.addEventListener('input', function() {horizontalIsometricRangeOutput.textContent = this.value;});
+        horizontalSteadyRangeInput.addEventListener('input', function() {horizontalSteadyRangeOutput.textContent = this.value;});
+
+        verticalIntensityRangeInput.addEventListener('input', function() {verticalIntensityRangeOutput.textContent = this.value;});
+        verticalIsometricRangeInput.addEventListener('input', function() {verticalIsometricRangeOutput.textContent = this.value;});
+        verticalSteadyRangeInput.addEventListener('input', function() {verticalSteadyRangeOutput.textContent = this.value;});
+
+        zoomIntensityRangeInput.addEventListener('input', function() {zoomIntensityRangeOutput.textContent = this.value;});
+    </script>
+    <script>
+        /* Interface */
+        const imageInput = document.getElementById('imageInput');
+        const renderButton = document.getElementById('renderButton');
+        const statusDiv = document.getElementById('status');
+        const videoOutput = document.getElementById('videoOutput');
+
+        /* Default settings */
+        var durationInput = document.getElementById('durationInput');
+        var framerateInput = document.getElementById('framerateInput');
+        var heightInput = document.getElementById('heightInput');
+        var widthInput = document.getElementById('widthInput');
+
+        /* Animation canvases */
+        var animationCircleCanvas = document.getElementById('animCircleCanvas');
+        var animationHorizontalCanvas = document.getElementById('animHorizontalCanvas');
+        var animationVerticalCanvas = document.getElementById('animVerticalCanvas');
+        var animationZoomCanvas = document.getElementById('animZoomCanvas');
+
+        /* Animation tabs */
+        var animationCircleTab = document.getElementById('animCircleTab');
+        var animationVerticalTab = document.getElementById('animVerticalTab');
+        var animationHorizontalTab = document.getElementById('animHorizontalTab');
+        var animationZoomTab = document.getElementById('animZoomTab');
+        
+        /* Animation settings */
+        var animationCircleEnabled = document.getElementById('animCircleEnabled');
+        var animationHorizontalEnabled = document.getElementById('animHorizontalEnabled');
+        var animationVerticalEnabled = document.getElementById('animVerticalEnabled');
+        var animationZoomEnabled = document.getElementById('animZoomEnabled');
+        
+        var animationCircleLoop = document.getElementById('animCircleLoop');
+        var animationHorizontalLoop = document.getElementById('animHorizontalLoop');
+        var animationVerticalLoop = document.getElementById('animVerticalLoop');
+        var animationZoomLoop = document.getElementById('animZoomLoop');
+
+        circleIntensity = document.getElementById('animCircleIntensityInput');
+        circleReverse = document.getElementById('animCircleReverseInput');
+        circleSteady = document.getElementById('animCircleSteadyInput');
+        circleIsometric = document.getElementById('animCircleIsometricInput');
+        circleCumulative = document.getElementById('animCircleCumulativeInput');
+        circleSmooth = document.getElementById('animCircleSmoothInput');
+
+        horizontalIntensity = document.getElementById('animHorizontalIntensityInput');
+        horizontalReverse = document.getElementById('animHorizontalReverseInput');
+        horizontalSteady = document.getElementById('animHorizontalSteadyInput');
+        horizontalIsometric = document.getElementById('animHorizontalIsometricInput');
+        horizontalCumulative = document.getElementById('animHorizontalCumulativeInput');
+        horizontalSmooth = document.getElementById('animHorizontalSmoothInput');
+
+        verticalIntensity = document.getElementById('animVerticalIntensityInput');
+        verticalReverse = document.getElementById('animVerticalReverseInput');
+        verticalSteady = document.getElementById('animVerticalSteadyInput');
+        verticalIsometric = document.getElementById('animVerticalIsometricInput');
+        verticalCumulative = document.getElementById('animVerticalCumulativeInput');
+        verticalSmooth = document.getElementById('animVerticalSmoothInput');
+
+        zoomIntensity = document.getElementById('animZoomIntensityInput');
+        zoomReverse = document.getElementById('animZoomReverseInput');
+        zoomCumulative = document.getElementById('animZoomCumulativeInput');
+        zoomSmooth = document.getElementById('animZoomSmoothInput');
+
+        /* Animation handler's */
+        /* Circle canvas handler */
+        animationCircleTab.addEventListener('click', () => {
+            animationCircleCanvas.hidden = false;
+            animationHorizontalCanvas.hidden = true;
+            animationVerticalCanvas.hidden = true;
+            animationZoomCanvas.hidden = true;
+            
+            animationCircleTab.classList.add("active");
+            animationVerticalTab.classList.remove("active");
+            animationHorizontalTab.classList.remove("active");
+            animationZoomTab.classList.remove("active");
+        });
+
+        animationCircleEnabled.addEventListener('click', () => {
+            if (animationCircleEnabled.checked === true) {
+                circleIntensity.disabled = false;
+                circleReverse.disabled = false;
+                circleSteady.disabled = false;
+                circleIsometric.disabled = false;
+                circleCumulative.disabled = false;
+                circleSmooth.disabled = false;
+            } else {
+                circleIntensity.disabled = true;
+                circleReverse.disabled = true;
+                circleSteady.disabled = true;
+                circleIsometric.disabled = true;
+                circleCumulative.disabled = true;
+                circleSmooth.disabled = true;
+            }
+        });
+
+        /* Horizontal canvas handler */
+        animationHorizontalTab.addEventListener('click', () => {
+            animationCircleCanvas.hidden = true;
+            animationHorizontalCanvas.hidden = false;
+            animationVerticalCanvas.hidden = true;
+            animationZoomCanvas.hidden = true;
+
+            animationHorizontalTab.classList.add("active");
+            animationCircleTab.classList.remove("active");
+            animationVerticalTab.classList.remove("active");
+            animationZoomTab.classList.remove("active");
+        });
+
+        animationHorizontalEnabled.addEventListener('click', () => {
+            if (animationHorizontalEnabled.checked === true) {
+                animationHorizontalLoop.disabled = false;
+                horizontalIntensity.disabled = false;
+                horizontalReverse.disabled = false;
+                horizontalSteady.disabled = false;
+                horizontalIsometric.disabled = false;
+                horizontalCumulative.disabled = false;
+                horizontalSmooth.disabled = false;
+            } else {
+                animationHorizontalLoop.disabled = true;
+                horizontalIntensity.disabled = true;
+                horizontalReverse.disabled = true;
+                horizontalSteady.disabled = true;
+                horizontalIsometric.disabled = true;
+                horizontalCumulative.disabled = true;
+                horizontalSmooth.disabled = true;
+            }
+        });
+
+        /* Vertical canvas handler */
+        animationVerticalTab.addEventListener('click', () => {
+            animationCircleCanvas.hidden = true;
+            animationHorizontalCanvas.hidden = true;
+            animationVerticalCanvas.hidden = false;
+            animationZoomCanvas.hidden = true;
+
+            animationVerticalTab.classList.add("active");
+            animationCircleTab.classList.remove("active");
+            animationHorizontalTab.classList.remove("active");
+            animationZoomTab.classList.remove("active");
+        });        
+
+        animationVerticalEnabled.addEventListener('click', () => {
+            if (animationVerticalEnabled.checked === true) {
+                animationVerticalLoop.disabled = false;
+                verticalIntensity.disabled = false;
+                verticalReverse.disabled = false;
+                verticalSteady.disabled = false;
+                verticalIsometric.disabled = false;
+                verticalCumulative.disabled = false;
+                verticalSmooth.disabled = false;
+            } else {
+                animationVerticalLoop.disabled = true;
+                verticalIntensity.disabled = true;
+                verticalReverse.disabled = true;
+                verticalSteady.disabled = true;
+                verticalIsometric.disabled = true;
+                verticalCumulative.disabled = true;
+                verticalSmooth.disabled = true;
+            }
+        });
+
+        /* Zoom canvas handler */
+        animationZoomTab.addEventListener('click', () => {
+            animationCircleCanvas.hidden = true;
+            animationHorizontalCanvas.hidden = true;
+            animationVerticalCanvas.hidden = true;
+            animationZoomCanvas.hidden = false;
+
+            animationZoomTab.classList.add("active");
+            animationCircleTab.classList.remove("active");
+            animationHorizontalTab.classList.remove("active");
+            animationVerticalTab.classList.remove("active");
+        });
+
+        animationZoomEnabled.addEventListener('click', () => {
+            if (animationZoomEnabled.checked === true) {
+                animationZoomLoop.disabled = false;
+                zoomIntensity.disabled = false;
+                zoomReverse.disabled = false;
+                zoomCumulative.disabled = false;
+                zoomSmooth.disabled = false;
+            } else {
+                animationZoomLoop.disabled = true;
+                zoomIntensity.disabled = true;
+                zoomReverse.disabled = true;
+                zoomCumulative.disabled = true;
+                zoomSmooth.disabled = true;
+            }
+        });
+
+
+        imageInput.addEventListener('change', () => {
+            renderButton.disabled = !imageInput.files[0];
+        });
+
+        renderButton.addEventListener('click', async () => {
+            const duration = durationInput.value;
+            const framerate = framerateInput.value;
+            const height = heightInput.value;
+            const width = widthInput.value;
+
+            const image = imageInput.files[0];
+            const formData = new FormData();
+
+            formData.append('duration', duration);
+            formData.append('framerate', framerate);
+            formData.append('height', height);
+            formData.append('width', width);
+            formData.append('image', image);
+
+            if (animationCircleEnabled.checked) {
+                formData.append('circleEnabled', true);
+                formData.append('circleCumulative', circleCumulative.value);
+                formData.append('circleIntensity', circleIntensity.value);
+                formData.append('circleSmooth', circleSmooth.value);
+                formData.append('circleIsometric', circleIsometric.value);
+                formData.append('circleSteady', circleSteady.value);
+                formData.append('circleReverse', circleReverse.value);
+            }
+            if (animationHorizontalEnabled.checked) {
+                formData.append('horizontalEnabled', true);
+                formData.append('horizontalIntensity', horizontalIntensity.value);
+                formData.append('horizontalReverse', horizontalReverse.value);
+                formData.append('horizontalCumulative', horizontalCumulative.value);
+                formData.append('horizontalSmooth', horizontalSmooth.value);
+                formData.append('horizontalLoop', animationHorizontalLoop.checked);
+                formData.append('horizontalSteady', horizontalSteady.value);
+                formData.append('horizontalIsometric', horizontalIsometric.value);
+            }
+            if (animationVerticalEnabled.checked) {
+                formData.append('verticalEnabled', true);
+                formData.append('verticalIntensity', verticalIntensity.value);
+                formData.append('verticalReverse', verticalReverse.value);
+                formData.append('verticalCumulative', verticalCumulative.value);
+                formData.append('verticalSmooth', verticalSmooth.value);
+                formData.append('verticalLoop', animationVerticalLoop.checked);
+                formData.append('verticalSteady', verticalSteady.value);
+                formData.append('verticalIsometric', verticalIsometric.value);
+            }
+            if (animationZoomEnabled.checked) {
+                formData.append('zoomEnabled', true);
+                formData.append('zoomIntensity', zoomIntensity.value);
+                formData.append('zoomReverse', zoomReverse.value);
+                formData.append('zoomCumulative', zoomCumulative.value);
+                formData.append('zoomSmooth', zoomSmooth.value);
+                formData.append('zoomLoop', animationZoomLoop.checked);                
+            }
+
+            renderButton.disabled = true;
+            statusDiv.innerText = 'Отправка изображения...';
+
+            try {
+                const response = await fetch('/api/create_video', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const data = await response.json();
+                if (response.status !== 202) {
+                    statusDiv.innerText = `Ошибка: ${data.error}`;
+                    renderButton.disabled = false;
+                    return;
+                }
+
+                const taskId = data.task_id;
+                statusDiv.innerText = `Рендеринг запущен. Идентификатор задания: ${taskId}.  Проверка состояния задачи...`;
+                await pollTaskStatus(taskId);
+
+            } catch (error) {
+                statusDiv.innerText = `Ошибка: ${error}`;
+                renderButton.disabled = false;
+            }
+        });
+
+        async function pollTaskStatus(taskId) {
+            let intervalId = setInterval(async () => {
+                try {
+                    const response = await fetch(`/api/task_status/${taskId}`);
+                    const data = await response.json();
+
+                    if (data.state === 'SUCCESS') {
+                        statusDiv.innerText = 'Рендеринг успешно завершен! Видео доступно в панели предпросмотра:';
+                        videoOutput.src = data.status;
+                        videoOutput.style.display = 'block';
+                        renderButton.disabled = false;
+                        clearInterval(intervalId);
+                    } else if (data.state === 'FAILURE') {
+                        statusDiv.innerText = `Ошибка рендеринга: ${data.status}`;
+                        renderButton.disabled = false;
+                        clearInterval(intervalId);
+                    } else {
+                        statusDiv.innerText = `Выполняется рендеринг... Состояние: ${data.status}`;
+                    }
+                } catch (error) {
+                    statusDiv.innerText = `Ошибка опроса задачи: ${error}`;
+                    renderButton.disabled = false;
+                    clearInterval(intervalId);
+                }
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
